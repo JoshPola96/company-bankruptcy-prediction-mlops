@@ -1,0 +1,9 @@
+mlflow
+apache-airflow
+pytest
+pre-commit
+pandas
+numpy
+imblearn
+black
+isort

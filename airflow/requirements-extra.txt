@@ -1,0 +1,6 @@
+pendulum
+dotenv
+evidently
+imblearn
+matplotlib
+seaborn

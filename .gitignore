@@ -1,0 +1,45 @@
+# Virtual Environments & Build Artifacts
+.venv/
+venv/
+env/
+.env
+.env.*.local
+__pycache__/
+*.pyc
+dist/
+build/
+*.egg-info/
+
+# Data & Models
+data/
+mlruns/
+.mlflow/
+mlflow_setup/
+
+# Terraform
+.terraform/
+*.tfvars
+terraform.tfstate*
+.terraform.lock.hcl
+
+# Docker
+streamlit_app/src/
+streamlit_app/data/
+docker-compose.override.yml
+.dockerignore
+
+# Airflow & Logs
+logs/
+dags/logs/
+*.log
+airflow-worker/
+airflow-scheduler/
+airflow-webserver/
+airflow.cfg
+
+# IDE & System Files
+.idea/
+.vscode/
+.history/
+.ipynb_checkpoints/
+.DS_Store

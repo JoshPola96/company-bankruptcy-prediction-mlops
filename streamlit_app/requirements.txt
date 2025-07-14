@@ -1,0 +1,7 @@
+streamlit
+pandas
+joblib
+numpy
+mlflow
+dill
+boto3
