@@ -209,11 +209,11 @@ data "aws_caller_identity" "current" {}
 # --- ECR Instance for Streamlit App Dovker Image ---
 resource "aws_ecr_repository" "app_repo" {
   name = var.ecr_repo_name
-  
+
   image_scanning_configuration {
     scan_on_push = true
   }
-  
+
   tags = {
     Name = "company-bankrupt-prediction-app"
   }

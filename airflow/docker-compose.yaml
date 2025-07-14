@@ -18,12 +18,12 @@ x-airflow-common:
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'true'
     AIRFLOW__CORE__EXECUTION_API_SERVER_URL: 'http://airflow-apiserver:8080/execution/'
-    AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true' 
+    AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
     # Keep this, as it allows for overriding via .env or directly in command line
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
     AIRFLOW_CONFIG: '/opt/airflow/config/airflow.cfg'
     PYTHONPATH: /opt/airflow:/opt/airflow/src:${PYTHONPATH}
-    AWS_ACCOUNT_ID: ${AWS_ACCOUNT_ID} 
+    AWS_ACCOUNT_ID: ${AWS_ACCOUNT_ID}
     AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
     AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
     AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION}
@@ -281,7 +281,7 @@ services:
         echo "Files in shared volumes:"
         echo
         ls -la /opt/airflow/{logs,dags,plugins,config,src,data,mlflow_setup,terraform}
-        
+
         # --- NEW: Automated variable setup ---
         # This conditional logic ensures the variables are only set once during the initial setup.
         if [[ "${_AIRFLOW_DB_MIGRATE}" == "true" ]]; then
@@ -291,7 +291,7 @@ services:
           /entrypoint airflow variables set aws_default_region "${AWS_DEFAULT_REGION}"
           echo "Airflow variables have been set."
         fi
-        
+
     environment:
       <<: *airflow-common-env
       _AIRFLOW_DB_MIGRATE: 'true'

@@ -4,7 +4,7 @@
 
 This project implements a robust, end-to-end MLOps pipeline designed to predict company bankruptcy. The problem of identifying companies at risk of bankruptcy is critical for investors, creditors, and business analysts to make informed decisions and mitigate financial risks. Early and accurate prediction allows stakeholders to intervene, adjust strategies, or protect investments before significant losses occur.
 
-Our solution tackles this challenge by building an automated, self-healing machine learning system that not only trains and deploys a predictive model but also continuously monitors its performance and triggers retraining when necessary. This ensures that the model remains accurate and relevant in a constantly evolving financial landscape, solving the common MLOps challenges of model drift, manual deployment, and lack of reproducibility.
+My solution tackles this challenge by building an automated, self-healing machine learning system that not only trains and deploys a predictive model but also continuously monitors its performance and triggers retraining when necessary. This ensures that the model remains accurate and relevant in a constantly evolving financial landscape, solving the common MLOps challenges of model drift, manual deployment, and lack of reproducibility.
 
 ### 📊 Dataset Information
 
@@ -16,13 +16,13 @@ This project leverages a modern MLOps stack to create a resilient and automated 
 
 - **Workflow Orchestration:** **Apache Airflow** orchestrates the entire ML pipeline, managing data ingestion, preprocessing, model training, deployment, and continuous monitoring via a series of interconnected Directed Acyclic Graphs (DAGs), and is hosted and managed locally.
 - **Infrastructure as Code (IaC):** **Terraform** provisions and manages all necessary cloud resources on AWS, ensuring consistent and repeatable infrastructure deployments.
-- **Experiment Tracking & Model Registry:** **MLflow** is hosted and managed locally for logging experiment parameters, metrics, and artifacts. The best model is also promoted to production and is constantly updated with the best versions in each runs.
+- **Experiment Tracking & Model Registry:** **MLflow** is hosted and managed locally for logging experiment parameters, metrics, and artifacts. The best performing model is automatically promoted to production and constantly updated with the best versions from each training run.
 - **Containerization:** **Docker** is used to package both the Airflow environment and the Streamlit application for consistent, isolated deployments.
 - **Model Serving:** **Streamlit** provides an intuitive, interactive web application to serve real-time bankruptcy predictions from the deployed model.
 - **Monitoring & Data Quality:** **Evidently AI** is integrated into the pipeline to monitor for data drift in production. It compares live inference data against training data, triggering automated retraining when significant drift is detected.
 - **Cloud Provider:** **Amazon Web Services (AWS)** hosts all the infrastructure, including EC2 for the Streamlit app, S3 for data storage, ECR for Docker images, and IAM for access management.
 
-*Only the trained models and application infrastructure are deployed to AWS.*
+**Architecture Note:** The development environment (Airflow orchestration, MLflow tracking, data download.....) runs locally, while only the trained models, their artifacts, and the Streamlit application infrastructure are deployed to AWS for cloud-based access and serving.
 
 ## 📦 Project Structure
 
@@ -208,7 +208,7 @@ After completion, you can access:
 2. **Manual Execution:** From the Airflow UI (`http://localhost:8080`), you need to **manually trigger each DAG** in the following order:
 
    - `data_download_pipeline_dag`
-   - `data_consolidation_pipeline_dag` 
+   - `data_consolidation_pipeline_dag`
    - `model_training_pipeline_dag` (⚠️ **May take up to 15 minutes**)
    - `streamlit_deployment_pipeline_dag`
 
