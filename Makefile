@@ -91,7 +91,7 @@ clean:
 
 ## ---------- All-in-one ----------
 
-all_up: format lint test airflow_up mlflow_up
+all_up: format lint test airflow_init airflow_up mlflow_up
 	@echo "🎉 ✅ All checks done! Airflow and MLflow are up and running."
 	@echo "💻 Access Airflow UI at: http://localhost:8080"
 	@echo "💻 Access MLflow UI at: http://localhost:$(MLFLOW_PORT)"
