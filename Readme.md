@@ -1,4 +1,4 @@
-# 📈 End-to-End MLOps Pipeline for Company Bankruptcy Prediction - MLOps Zoomcamp - [GitHub]([https://github.com/DataTalksClub/data-engineering-zoomcamp/tree/main](https://github.com/DataTalksClub/mlops-zoomcamp))
+# 📈 End-to-End MLOps Pipeline for Company Bankruptcy Prediction - MLOps Zoomcamp - [GitHub]([https://github.com/DataTalksClub/data-engineering-zoomcamp/tree/main](https://github.com/DataTalksClub/mlops-zoomcamp)
 
 ## 🌟 Project Overview
 
