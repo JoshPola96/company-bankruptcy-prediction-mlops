@@ -8,7 +8,7 @@ My solution tackles this challenge by building an automated, self-healing machin
 
 ### 📊 Dataset Information
 
-The datasets are sourced from three different providers and have been engineered and merged to create a comprehensive training dataset. The data exhibits **highly imbalanced characteristics** with significantly fewer samples of bankrupt companies compared to non-bankrupt ones. This imbalance has been mitigated as much as possible using SMOTE (Synthetic Minority Oversampling Technique) and other advanced training techniques, though some impact on model performance is still observable and expected given the nature of the problem domain.
+The datasets are sourced from three different providers and have been engineered and merged to create a comprehensive training dataset. **Two of the datasets are sourced from Kaggle** and require Kaggle CLI authentication to download automatically. The data exhibits **highly imbalanced characteristics** with significantly fewer samples of bankrupt companies compared to non-bankrupt ones. This imbalance has been mitigated as much as possible using SMOTE (Synthetic Minority Oversampling Technique) and other advanced training techniques, though some impact on model performance is still observable and expected given the nature of the problem domain.
 
 ## 🚀 MLOps Stack
 
@@ -21,6 +21,7 @@ This project leverages a modern MLOps stack to create a resilient and automated 
 - **Model Serving:** **Streamlit** provides an intuitive, interactive web application to serve real-time bankruptcy predictions from the deployed model.
 - **Monitoring & Data Quality:** **Evidently AI** is integrated into the pipeline to monitor for data drift in production. It compares live inference data against training data, triggering automated retraining when significant drift is detected.
 - **Cloud Provider:** **Amazon Web Services (AWS)** hosts all the infrastructure, including EC2 for the Streamlit app, S3 for data storage, ECR for Docker images, and IAM for access management.
+- **Data Source Integration:** **Kaggle CLI** enables automated download of datasets from Kaggle's public repository during pipeline execution.
 
 **Architecture Note:** The development environment (Airflow orchestration, MLflow tracking, data download.....) runs locally, while only the trained models, their artifacts, and the Streamlit application infrastructure are deployed to AWS for cloud-based access and serving.
 
@@ -94,6 +95,7 @@ Ensure you have the following installed on your machine:
 - **Docker Desktop:** Includes Docker Engine and Docker Compose. [Download here](https://www.docker.com/products/docker-desktop/)
 - **Terraform CLI:** [Download here](https://developer.hashicorp.com/terraform/downloads)
 - **AWS CLI:** Configured with an AWS user that has programmatic access and sufficient permissions to create EC2 instances, S3 buckets, ECR repositories, and IAM roles. [Configure AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html)
+- **Kaggle Account:** Required for accessing datasets. [Sign up here](https://www.kaggle.com/account/login?phase=startRegisterTab) if you don't have an account.
 
 ### Step 1: Clone the Repository
 
@@ -102,7 +104,57 @@ git clone https://github.com/your-username/company-bankrupt-prediction.git
 cd company-bankrupt-prediction
 ```
 
-### Step 2: Configure Environment Variables
+### Step 2: Set Up Kaggle CLI Authentication
+
+Since two of the datasets are sourced from Kaggle, you need to set up Kaggle API credentials for automated data download.
+
+#### 2.1: Install Kaggle CLI (Optional - for local testing)
+
+```bash
+pip install kaggle
+```
+
+#### 2.2: Generate Kaggle API Token
+
+1. **Log in to Kaggle:** Go to [kaggle.com](https://www.kaggle.com) and sign in to your account
+2. **Access Account Settings:** Click on your profile picture in the top right corner → Select "Account"
+3. **Create API Token:** Scroll down to the "API" section → Click **"Create New Token"**
+4. **Download kaggle.json:** This will download a `kaggle.json` file containing your API credentials
+
+#### 2.3: Set Up Kaggle Credentials Directory
+
+Create the Kaggle credentials directory and place your API token:
+
+```bash
+# Create .kaggle directory in your home folder
+mkdir -p ~/.kaggle
+
+# Move your downloaded kaggle.json file to the .kaggle directory
+# Replace /path/to/downloads/ with your actual download path
+mv /path/to/downloads/kaggle.json ~/.kaggle/
+
+# Set appropriate permissions (important for security)
+chmod 600 ~/.kaggle/kaggle.json
+```
+
+#### 2.4: Verify Kaggle CLI Setup (Optional)
+
+Test your Kaggle authentication (if you installed kaggle CLI locally):
+
+```bash
+kaggle datasets list --max-size 100
+```
+
+**Important Notes:**
+- The `kaggle.json` file contains your username and API key in this format:
+  ```json
+  {"username":"your_kaggle_username","key":"your_api_key"}
+  ```
+- **Never commit this file to version control** - it contains sensitive credentials
+- The Docker Compose configuration automatically mounts `~/.kaggle:/home/airflow/.kaggle:ro` to provide Kaggle access to Airflow containers
+- If you encounter permission issues, ensure the `kaggle.json` file has `600` permissions (`-rw-------`)
+
+### Step 3: Configure Environment Variables
 
 This project uses `.env` files for environment-specific configurations and secrets.
 
@@ -143,7 +195,7 @@ key_name                  = "mlops-zoomcamp"
 monitoring_s3_bucket_name = "company-bankruptcy-prediction-monitoring"
 ```
 
-### Step 3: Deploy AWS Infrastructure with Terraform
+### Step 4: Deploy AWS Infrastructure with Terraform
 
 Navigate to the `terraform/` directory and provision your infrastructure:
 
@@ -155,7 +207,7 @@ terraform apply --auto-approve
 
 After successful execution, Terraform will output the public IP of your EC2 instance. Keep this handy for accessing your deployed Streamlit application.
 
-### Step 4: Local Development Environment Setup
+### Step 5: Local Development Environment Setup
 
 Set up a local Python virtual environment for linting and testing:
 
@@ -171,7 +223,7 @@ To manually activate this environment for direct scripting:
 source venv/bin/activate
 ```
 
-### Step 5: Install Pre-commit Hooks
+### Step 6: Install Pre-commit Hooks
 
 Enable automatic code quality checks before every commit:
 
@@ -182,7 +234,7 @@ pre-commit install
 
 Now, `git commit` will automatically format and lint your code based on `.pre-commit-config.yaml`.
 
-### Step 6: Start All Local Services
+### Step 7: Start All Local Services
 
 Use the Makefile to start both Airflow and MLflow services:
 
@@ -202,19 +254,24 @@ After completion, you can access:
 
 **Note:** The exact URLs will also be displayed in the terminal output from the Makefile commands for easy access.
 
-### Step 7: Trigger the ML Pipeline
+### Step 8: Trigger the ML Pipeline
 
 1. **Automatic DAG Unpausing:** The `airflow-scheduler` service automatically runs `src/unpause_all_dags.sh` on startup to unpause all DAGs
 2. **Manual Execution:** From the Airflow UI (`http://localhost:8080`), you need to **manually trigger each DAG** in the following order:
 
-   - `data_download_pipeline_dag`
+   - `data_download_pipeline_dag` (⚠️ **Requires Kaggle credentials**)
    - `data_consolidation_pipeline_dag`
    - `model_training_pipeline_dag` (⚠️ **May take up to 15 minutes**)
    - `streamlit_deployment_pipeline_dag`
 
 **Important:** These DAGs are **not automatically chained** and must be run manually in sequence. Wait for each DAG to complete successfully before triggering the next one.
 
-### Step 8: Access the Deployed Streamlit App
+**Kaggle Authentication in Pipeline:** The `data_download_pipeline_dag` will automatically use your Kaggle credentials from `~/.kaggle/kaggle.json` to download the required datasets. If you encounter authentication errors, verify that:
+- Your `kaggle.json` file is properly formatted
+- The file has correct permissions (`chmod 600 ~/.kaggle/kaggle.json`)
+- Your Kaggle API token is active and hasn't expired
+
+### Step 9: Access the Deployed Streamlit App
 
 After the `streamlit_deployment_pipeline_dag` completes successfully:
 
@@ -224,7 +281,7 @@ After the `streamlit_deployment_pipeline_dag` completes successfully:
 
 **Note:** The IP address and Evidently Bucket URL are also available in the Airflow DAG run logs.
 
-### Step 9: Continuous Monitoring and Automated Retraining
+### Step 10: Continuous Monitoring and Automated Retraining
 
 The `monitoring_pipeline_dag` runs on a scheduled basis (configurable in the DAG file) and:
 
@@ -250,6 +307,44 @@ make clean    # Removes local build artifacts, venv, and generated data/MLflow f
 cd terraform
 terraform destroy --auto-approve
 ```
+
+## 🔧 Troubleshooting
+
+### Kaggle Authentication Issues
+
+If you encounter Kaggle-related errors during the `data_download_pipeline_dag`:
+
+1. **Verify credentials file exists:**
+   ```bash
+   ls -la ~/.kaggle/kaggle.json
+   ```
+
+2. **Check file permissions:**
+   ```bash
+   chmod 600 ~/.kaggle/kaggle.json
+   ```
+
+3. **Validate JSON format:**
+   ```bash
+   cat ~/.kaggle/kaggle.json
+   # Should show: {"username":"your_username","key":"your_api_key"}
+   ```
+
+4. **Test Kaggle CLI (if installed locally):**
+   ```bash
+   kaggle datasets list --max-size 10
+   ```
+
+5. **Docker container access:** The Airflow containers automatically mount your Kaggle credentials via the volume:
+   ```yaml
+   - ~/.kaggle:/home/airflow/.kaggle:ro
+   ```
+
+### Common Error Messages
+
+- **"Unauthorized: You need to create an API token"**: Your `kaggle.json` file is missing or incorrectly formatted
+- **"Permission denied"**: File permissions are too open; run `chmod 600 ~/.kaggle/kaggle.json`
+- **"Dataset not found"**: Verify the dataset URLs in your data download DAG are correct and publicly accessible
 
 ## ✅ Code Quality & Testing
 
@@ -279,7 +374,7 @@ This project uses a layered dependency management approach:
 - **`requirements.txt` (Project Root):** Core Python dependencies for local development, linting, formatting, and testing
 - **`airflow/requirements-*.txt` (Airflow Specific):** Dependencies for the custom Airflow Docker image
   - `requirements-aws.txt`: AWS-specific packages
-  - `requirements-extra.txt`: Additional Airflow operators
+  - `requirements-extra.txt`: Additional Airflow operators and Kaggle CLI
   - `requirements-ml.txt`: Machine learning libraries
 - **`streamlit_app/requirements.txt` (Streamlit App):** Minimal dependencies for the web application serving environment
 
@@ -292,6 +387,8 @@ This project uses a layered dependency management approach:
 - **Real-Time Predictions:** Streamlit web application for interactive predictions
 - **Quality Assurance:** Comprehensive testing and code quality checks
 - **Imbalanced Data Handling:** SMOTE and advanced techniques for dealing with bankruptcy prediction challenges
+- **Automated Data Sourcing:** Kaggle CLI integration for seamless dataset downloading
+- **Containerized Deployment:** Docker-based consistent environments across development and production
 
 ## 🎯 Business Impact
 
@@ -302,5 +399,6 @@ This MLOps pipeline addresses critical business needs in bankruptcy prediction:
 - **Scalable Deployment:** Cloud-native architecture supports growing data volumes
 - **Reproducible Results:** Consistent model training and deployment processes
 - **Cost Efficiency:** Automated retraining only when necessary, reducing computational costs
+- **Data Accessibility:** Automated integration with public datasets reduces manual data collection overhead
 
 **Performance Considerations:** Due to the challenging nature of the merged datasets from three different sources and the highly imbalanced distribution of bankruptcy cases, model performance may be limited. This is an expected characteristic of real-world financial prediction problems where bankruptcies are rare events, making accurate prediction inherently difficult despite advanced techniques like SMOTE.
