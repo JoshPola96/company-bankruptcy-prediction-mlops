@@ -1,5 +1,7 @@
 # 📈 End-to-End MLOps Pipeline for Company Bankruptcy Prediction — MLOps Zoomcamp — [GitHub](https://github.com/DataTalksClub/mlops-zoomcamp)
 
+> **Scope** · Capstone for the [MLOps Zoomcamp](https://github.com/DataTalksClub/mlops-zoomcamp) (DataTalksClub) — peer-reviewed against a published rubric. [Certificate](https://certificate.datatalks.club/mlops-zoomcamp/2025/c8e8b5ba3fbcfde9632b6c623269ae4bbde4a2d2.pdf)
+
 ## 🌟 Project Overview
 
 This project implements a robust, end-to-end MLOps pipeline designed to predict company bankruptcy. The problem of identifying companies at risk of bankruptcy is critical for investors, creditors, and business analysts to make informed decisions and mitigate financial risks. Early and accurate prediction allows stakeholders to intervene, adjust strategies, or protect investments before significant losses occur.
