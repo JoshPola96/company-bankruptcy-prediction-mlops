@@ -2,6 +2,19 @@
 
 > **Scope** · Capstone for the [MLOps Zoomcamp](https://github.com/DataTalksClub/mlops-zoomcamp) (DataTalksClub) — peer-reviewed against a published rubric. [Certificate](https://certificate.datatalks.club/mlops-zoomcamp/2025/c8e8b5ba3fbcfde9632b6c623269ae4bbde4a2d2.pdf)
 
+> [!NOTE]
+> **Built 2025. CI is currently red, for a known and diagnosed reason.**
+> MLflow has since moved its filesystem tracking backend into maintenance mode:
+> it now raises unless `MLFLOW_ALLOW_FILE_STORE=true` is set, so
+> `tests/test_integration_mlflow.py` fails at `set_experiment` against a
+> `file:./mlruns_test` URI. One test fails, one passes.
+> The fix is to move that test onto a SQLite tracking backend, which is what
+> MLflow now recommends.
+>
+> The deeper cause is that `requirements.txt` pins nothing, so every run
+> resolves to the newest release of everything. That is the real defect, and it
+> is queued to be fixed properly rather than papered over with an opt-out flag.
+
 ## 🌟 Project Overview
 
 This project implements a robust, end-to-end MLOps pipeline designed to predict company bankruptcy. The problem of identifying companies at risk of bankruptcy is critical for investors, creditors, and business analysts to make informed decisions and mitigate financial risks. Early and accurate prediction allows stakeholders to intervene, adjust strategies, or protect investments before significant losses occur.
