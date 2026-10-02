@@ -1,3 +1,4 @@
+# .gitignore
 # Virtual Environments & Build Artifacts
 .venv/
 venv/
@@ -43,3 +44,4 @@ airflow.cfg
 .history/
 .ipynb_checkpoints/
 .DS_Store
+.pytest_cache/
